@@ -1,3 +1,1 @@
-# AOC 2024
-
-- https://adventofcode.com/
+A friendly advent of code 2023 challenge

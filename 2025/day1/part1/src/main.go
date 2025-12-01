@@ -1,0 +1,42 @@
+package main
+
+import (
+	"os"
+	"strings"
+	"strconv"
+)
+
+func main() {
+	content, err := os.ReadFile("input.txt")
+	if err != nil {
+		panic(err)
+	}
+	current_position := 50
+	zeroes := 0
+	lines := strings.SplitSeq(string(content), "\n")
+	for line := range lines {
+		if len(line) == 0 {
+			continue
+		}
+
+		direction := line[:1]
+		distance, err := strconv.Atoi(line[1:])
+
+		if err != nil {
+			panic(err)
+		}
+
+		switch direction {
+		case "L":
+			current_position = (current_position - distance + 100) % 100
+		case "R":
+			current_position = (current_position + distance) % 100
+		}
+
+		if current_position == 0 {
+			zeroes++
+		}
+	}
+
+	println("Total zeroes:", zeroes)
+}
