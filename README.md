@@ -1,1 +1,3 @@
-A friendly advent of code 2023 challenge
+# Advent of Code
+
+https://adventofcode.com/
