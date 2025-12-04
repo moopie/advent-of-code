@@ -1,6 +1,6 @@
 ENTRY_POINT := src/main.go
 BUILD_DIR := ./build
-BIN_NAME := day4part1
+BIN_NAME := day4part2
 INPUT := ../input.txt
 
 build: $(ENTRY_POINT)
