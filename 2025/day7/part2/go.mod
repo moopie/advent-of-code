@@ -1,3 +1,3 @@
-module day7part1
+module day7part2
 
 go 1.25.5
