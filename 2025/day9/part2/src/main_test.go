@@ -13,7 +13,7 @@ func TestTheater(t *testing.T) {
 	2,3
 	7,3
 	`
-	expected := 24
+	expected := int64(24)
 
 	result := FindSeating(input)
 
