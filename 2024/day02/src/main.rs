@@ -90,15 +90,6 @@ fn calc_distance_with_tolerance(vec: Vec<i32>) -> Safety {
     Safety::Unsafe
 }
 
-fn validate(a: i32, b: i32) -> bool {
-    let c = a - b;
-    if c.abs() >= 1 && c.abs() < 4 {
-        true
-    } else {
-        false
-    }
-}
-
 fn main() {
     println!("aoc2024 day 2!");
 
