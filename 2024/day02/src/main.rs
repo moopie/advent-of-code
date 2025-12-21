@@ -3,14 +3,14 @@ use std::fs;
 #[derive(Debug, PartialEq)]
 enum Safety {
     Safe,
-    Unsafe
+    Unsafe,
 }
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 enum Direction {
     None,
     Up,
-    Down
+    Down,
 }
 
 fn read_file(path: String) -> Vec<Vec<i32>> {
@@ -36,7 +36,6 @@ fn read_file(path: String) -> Vec<Vec<i32>> {
 }
 
 fn calc_distance(vec: Vec<i32>) -> Safety {
-
     let mut dir = Direction::None;
 
     if vec.is_empty() {
@@ -52,18 +51,15 @@ fn calc_distance(vec: Vec<i32>) -> Safety {
 
         if dist < 0 {
             cdir = Direction::Down;
-        }
-        else if dist > 0 {
+        } else if dist > 0 {
             cdir = Direction::Up;
-        }
-        else {
+        } else {
             return Safety::Unsafe;
         }
 
         if dir == Direction::None {
             dir = cdir;
-        }
-        else if dir != cdir {
+        } else if dir != cdir {
             return Safety::Unsafe;
         }
 
@@ -75,6 +71,34 @@ fn calc_distance(vec: Vec<i32>) -> Safety {
     return Safety::Safe;
 }
 
+fn calc_distance_with_tolerance(vec: Vec<i32>) -> Safety {
+    // already safe?
+    if calc_distance(vec.clone()) == Safety::Safe {
+        return Safety::Safe;
+    }
+
+    // try removing exactly one element
+    for i in 0..vec.len() {
+        let mut copy = vec.clone();
+        copy.remove(i);
+
+        if calc_distance(copy) == Safety::Safe {
+            return Safety::Safe;
+        }
+    }
+
+    Safety::Unsafe
+}
+
+fn validate(a: i32, b: i32) -> bool {
+    let c = a - b;
+    if c.abs() >= 1 && c.abs() < 4 {
+        true
+    } else {
+        false
+    }
+}
+
 fn main() {
     println!("aoc2024 day 2!");
 
@@ -84,6 +108,27 @@ fn main() {
     let count = res.filter(|x| x == &Safety::Safe).count();
 
     println!("Part 1 {count}");
+
+    // fast solution because I can't deal with this mess
+    // in 2025 i realized that it's easier to clone part 1 and modify it
+    // instead of trying to do both parts in the same file
+
+    let res2 = levels.iter().map(|lev| {
+        println!();
+        let v = lev.to_vec();
+        let safety = calc_distance_with_tolerance(v);
+        println!("__VEC__({lev:?}) {safety:?}");
+        safety
+    });
+
+    let mut safe = 0;
+    for r in res2 {
+        if r == Safety::Safe {
+            safe += 1
+        }
+    }
+
+    println!("Part 2 {safe}");
 }
 
 #[cfg(test)]
@@ -109,5 +154,54 @@ mod tests {
         let arr = [2, 1, 3, 4, 5, 6].to_vec();
         let res = calc_distance(arr);
         assert_eq!(res, Safety::Unsafe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist1() {
+        let arr = vec![33, 36, 35, 36, 33];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Unsafe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist2() {
+        let arr = vec![7, 6, 4, 2, 1];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Safe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist3() {
+        let arr = vec![1, 2, 7, 8, 9];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Unsafe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist4() {
+        let arr = vec![9, 7, 6, 2, 1];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Unsafe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist5() {
+        let arr = vec![1, 3, 2, 4, 5];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Safe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist6() {
+        let arr = vec![8, 6, 4, 4, 1];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Safe);
+    }
+
+    #[test]
+    fn test_calc_tolerant_dist7() {
+        let arr = vec![1, 3, 6, 7, 9];
+        let res = calc_distance_with_tolerance(arr);
+        assert_eq!(res, Safety::Safe);
     }
 }
