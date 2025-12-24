@@ -1,8 +1,7 @@
 fn main() {
     println!("AOC 2024 day 05!");
 
-    let file_contents = std::fs::read_to_string("input.txt")
-        .expect("err");
+    let file_contents = std::fs::read_to_string("input.txt").expect("err");
 
     let res = check_rules(&file_contents, false);
 
@@ -13,7 +12,7 @@ fn main() {
     println!("part 2 result: {}", res);
 }
 
-#[derive(Clone,Copy,Debug)]
+#[derive(Clone, Copy, Debug)]
 struct Rule {
     x: Page,
     y: Page,
@@ -22,11 +21,13 @@ struct Rule {
 type Page = u32;
 type Book = Vec<Page>;
 
-struct SafetyManual(Vec<Rule>, Vec<Book>);
+struct SafetyManual {
+    rules: Vec<Rule>,
+    books: Vec<Book>,
+}
 
 trait CheckValidity {
     fn check_validity(self, book: Book) -> bool;
-    fn correct(self, book: Book) -> Book;
 }
 
 impl CheckValidity for Rule {
@@ -35,62 +36,75 @@ impl CheckValidity for Rule {
         let page_y = book.iter().position(|p| *p == self.y);
         match (page_x, page_y) {
             (Some(x), Some(y)) => x < y,
-            _ => true
+            _ => true,
         }
-    }
-
-    fn correct(self, book: Book) -> Book {
-        let page_x = book.iter().position(|p| *p == self.x);
-        let page_y = book.iter().position(|p| *p == self.y);
-        let mut book = book.clone();
-
-        match (page_x, page_y) {
-            (Some(x), Some(y)) => {
-                if x > y {
-                    book.swap(x,y);
-                }
-                book
-            },
-            _ => {
-                book
-            }
-        }
-
     }
 }
 
-fn check_rules(input: &str, correct: bool) -> u32 {
-    let prog = get_update_record(input);
-    let rules = prog.0;
-    let mut total: Page = 0;
+fn sort_book(book: &Book, rules: &[Rule]) -> Book {
+    use std::collections::{HashMap, VecDeque};
 
-    for book in prog.1 {
-        let valid = rules.iter()
-            .all(|rule| rule.check_validity(book.to_vec()));
+    let mut adj: HashMap<Page, Vec<Page>> = HashMap::new();
+    let mut indeg: HashMap<Page, usize> = HashMap::new();
 
-        if valid && !correct {
-            let mid_index = book.len() / 2;
-            let mid_value = book[mid_index];
-            total = total + mid_value;
-        }
-        else if correct {
-            let mut new_entry = book.clone();
-            let mut is_valid = false;
+    for &p in book {
+        adj.entry(p).or_default();
+        indeg.entry(p).or_insert(0);
+    }
 
-            while !is_valid {
-                for rule in rules.iter() {
-                    new_entry = rule.correct(new_entry.clone());
-                }
-
-                is_valid = rules.iter().all(|r| r.check_validity(new_entry.to_vec()));
-            }
-            let mid_index = new_entry.len() / 2;
-            let mid_value = new_entry[mid_index];
-            total = total + mid_value;
+    for r in rules {
+        if book.contains(&r.x) && book.contains(&r.y) {
+            adj.get_mut(&r.x).unwrap().push(r.y);
+            *indeg.get_mut(&r.y).unwrap() += 1;
         }
     }
 
-    return total.try_into().unwrap();
+    let mut q: VecDeque<Page> = indeg
+        .iter()
+        .filter(|(_, &d)| d == 0)
+        .map(|(&k, _)| k)
+        .collect();
+
+    let mut out: Vec<Page> = vec![];
+
+    while let Some(x) = q.pop_front() {
+        out.push(x);
+        if let Some(children) = adj.get(&x) {
+            for &c in children {
+                let entry = indeg.get_mut(&c).unwrap();
+                *entry -= 1;
+                if *entry == 0 {
+                    q.push_back(c);
+                }
+            }
+        }
+    }
+
+    out
+}
+
+fn check_rules(input: &str, apply_correction: bool) -> u32 {
+    let manual = get_update_record(input);
+    let rules = manual.rules;
+    let mut total: Page = 0;
+
+    for book in manual.books.iter() {
+        let valid = rules.iter().all(|rule| rule.check_validity(book.to_vec()));
+
+        if valid && !apply_correction {
+            let mid_index = book.len() / 2;
+            let mid_value = book[mid_index];
+            total = total + mid_value;
+        } else if apply_correction {
+            if !valid {
+                let new_entry = sort_book(book, &rules);
+                let mid = new_entry[new_entry.len() / 2];
+                total += mid;
+            }
+        }
+    }
+
+    total.try_into().unwrap()
 }
 
 fn get_update_record(input: &str) -> SafetyManual {
@@ -102,31 +116,28 @@ fn get_update_record(input: &str) -> SafetyManual {
         let is_rule = line.contains("|");
 
         if is_rule {
-            let nums: Vec<u32>  = line.split("|")
-                .map(|x| {
-                    match x.trim().parse::<Page>() {
-                        Ok(value) => value,
-                        Err(_) => 0
-                    }
+            let nums: Vec<u32> = line
+                .split("|")
+                .map(|x| match x.trim().parse::<Page>() {
+                    Ok(value) => value,
+                    Err(_) => 0,
                 })
                 .collect();
 
             if nums.len() == 2 {
-                rules.push(Rule{
+                rules.push(Rule {
                     x: nums[0],
-                    y: nums[1]
+                    y: nums[1],
                 });
             }
-        }
-        else {
-            let nums: Vec<Page> = line.split(",")
-                    .map(|x| {
-                        match x.trim().parse::<Page>() {
-                            Ok(value) => value,
-                            Err(_) => 0
-                        }
-                    })
-                    .collect();
+        } else {
+            let nums: Vec<Page> = line
+                .split(",")
+                .map(|x| match x.trim().parse::<Page>() {
+                    Ok(value) => value,
+                    Err(_) => 0,
+                })
+                .collect();
 
             if nums.len() > 1 {
                 books.push(nums);
@@ -134,7 +145,10 @@ fn get_update_record(input: &str) -> SafetyManual {
         }
     }
 
-    SafetyManual(rules, books)
+    SafetyManual {
+        rules: rules,
+        books: books,
+    }
 }
 
 #[cfg(test)]
@@ -288,8 +302,27 @@ mod tests {
     #[test]
     fn test_p2_single2() {
         let input = r#"
-            97|75
-            47|53
+        47|53
+        97|13
+        97|61
+        97|47
+        75|29
+        61|13
+        75|53
+        29|13
+        97|29
+        53|29
+        61|53
+        97|53
+        61|29
+        47|13
+        75|47
+        97|75
+        47|61
+        75|61
+        47|29
+        75|13
+        53|13
 
             75,97,47,61,53
         "#;
