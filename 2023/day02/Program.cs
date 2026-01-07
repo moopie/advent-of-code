@@ -47,3 +47,53 @@ foreach (var line in contents)
 }
 
 Console.WriteLine($"Part 1 result: {sum}");
+
+sum = 0;
+
+foreach (var line in contents)
+{
+    var parts = line.Split(":");
+    var dict = new Dictionary<string, int>();
+    var id = parts[0][5..];
+    var rest = parts[1];
+    var moves = rest.Split(";");
+    foreach (var move in moves)
+    {
+        var stones = move.Split(",");
+        foreach (var stone in stones)
+        {
+            var kind = stone.Trim().Split(" ");
+            var num = int.Parse(kind[0]);
+            var name = kind[1];
+
+            if (!dict.ContainsKey(name))
+            {
+                dict[name] = num;
+            }
+            else
+            {
+                var current = dict[name];
+                if (current < num)
+                {
+                    dict[name] = num;
+                }
+            }
+        }
+    }
+
+    var cursum = 0;
+    foreach (var item in dict.Values)
+    {
+        if (cursum == 0)
+        {
+            cursum = item;
+        }
+        else
+        {
+            cursum *= item;
+        }
+    }
+    sum += cursum;
+}
+
+Console.WriteLine($"Part 2 result: {sum}");
