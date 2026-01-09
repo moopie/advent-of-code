@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+AOC_URL=https://adventofcode.com
+
+source .env
+
+main() {
+    local year=$1
+    local day=$2
+    curl -H "Cookie: session=$AOC_SESSION" "$AOC_URL/$year/day/$day/input"
+}
+
+main $@
