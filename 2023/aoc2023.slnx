@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/day04/">
     <Project Path="day04/main/main.csproj" />
+    <Project Path="day04/tests/tests.csproj" />
   </Folder>
   <Project Path="day02/day02.csproj" />
 </Solution>
