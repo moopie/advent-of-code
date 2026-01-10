@@ -7,5 +7,8 @@
     <Project Path="day03/Day3.Tests/Day3.Tests.csproj" />
     <Project Path="day03\Day3.Main\Day3.Main.csproj" />
   </Folder>
+  <Folder Name="/day04/">
+    <Project Path="day04/main/main.csproj" />
+  </Folder>
   <Project Path="day02/day02.csproj" />
 </Solution>
