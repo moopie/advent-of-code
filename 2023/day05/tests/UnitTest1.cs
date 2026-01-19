@@ -46,4 +46,12 @@ public class UnitTest1
 
         Assert.Equal(35, result);
     }
+
+    [Fact]
+    public void Part2ShouldBe46()
+    {
+        var result = Day5.SolvePart2(Example.Split("\n"));
+
+        Assert.Equal(46, result);
+    }
 }
