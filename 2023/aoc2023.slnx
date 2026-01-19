@@ -3,6 +3,9 @@
     <Project Path="day01/part1/part1.csproj" />
     <Project Path="day01/part2/part2.csproj" />
   </Folder>
+  <Folder Name="/day02/">
+    <Project Path="day02/day02.csproj" />
+  </Folder>
   <Folder Name="/day03/">
     <Project Path="day03/Day3.Tests/Day3.Tests.csproj" />
     <Project Path="day03\Day3.Main\Day3.Main.csproj" />
@@ -15,5 +18,8 @@
     <Project Path="day05/main/main.csproj" />
     <Project Path="day05/tests/tests.csproj" />
   </Folder>
-  <Project Path="day02/day02.csproj" />
+  <Folder Name="/day06/">
+    <Project Path="day06/main/main.csproj" />
+    <Project Path="day06/tests/tests.csproj" />
+  </Folder>
 </Solution>
