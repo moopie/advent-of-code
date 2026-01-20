@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AOC_URL=https://adventofcode.com
 
-source $SCRIPT_DIR/.env
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $ROOT_DIR/.env
 
 main() {
     local year=$1
