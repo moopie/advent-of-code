@@ -3,9 +3,15 @@
 AOC_URL=https://adventofcode.com
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $ROOT_DIR/.env
+if [[ -e $ROOT_DIR/.env ]]; then
+    source $ROOT_DIR/.env
+fi
 
 main() {
+    if [[ ! -n "$AOC_SESSION" ]]; then
+        echo "Please set AOC_SESSION or put it in $ROOT_DIR/.env"
+        return
+    fi
     local year=$1
     local day=$2
     curl -H "Cookie: session=$AOC_SESSION" "$AOC_URL/$year/day/$day/input"
