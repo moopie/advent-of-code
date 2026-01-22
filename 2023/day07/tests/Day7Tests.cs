@@ -18,4 +18,12 @@ public class Day7Tests
 
         Assert.Equal(6440, result);
     }
+
+    [Fact]
+    public void Part2_ShouldBe_5905()
+    {
+        var result = Day7.SolvePart2(Example);
+
+        Assert.Equal(5905, result);
+    }
 }
