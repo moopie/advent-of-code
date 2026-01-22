@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
-AOC_URL=https://adventofcode.com
+AOC_URL="https://adventofcode.com"
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -e $ROOT_DIR/.env ]]; then
-    source $ROOT_DIR/.env
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Load .env if it exists
+if [[ -f "$BASE_DIR/.env" ]]; then
+    source "$BASE_DIR/.env"
 fi
 
 main() {
-    if [[ ! -n "$AOC_SESSION" ]]; then
-        echo "Please set AOC_SESSION or put it in $ROOT_DIR/.env"
-        return
+    if [[ -z "$AOC_SESSION" ]]; then
+        echo "Please set AOC_SESSION or put it in $BASE_DIR/.env"
+        exit 1
     fi
-    local year=$1
-    local day=$2
-    curl -H "Cookie: session=$AOC_SESSION" "$AOC_URL/$year/day/$day/input"
+
+    local year="$1"
+    local day="$2"
+
+    if [[ -z "$year" || -z "$day" ]]; then
+        echo "Usage: $0 YEAR DAY"
+        exit 1
+    fi
+
+    curl -H "Cookie: session=${AOC_SESSION}" \
+        "${AOC_URL}/${year}/day/${day}/input"
 }
 
-main $@
+main "$@"
