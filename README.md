@@ -12,4 +12,6 @@ Use `aocinput` to get the AOC input file. To use it first set the `$AOC_SESSION`
 
 #### Usage
 
-`./aocinput <YEAR> <DAY>`
+```bash
+~ ./aocinput <YEAR> <DAY>
+```
