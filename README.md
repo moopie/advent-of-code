@@ -10,7 +10,7 @@ https://adventofcode.com/
 
 Use `aocinput` to get the AOC input file. To use it first set the `$AOC_SESSION` variable or put it in `.env`
 
-#### Usage
+### Usage
 
 ```bash
 ~ ./aocinput <YEAR> <DAY>
