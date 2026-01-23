@@ -11,13 +11,16 @@ fi
 
 usage() {
     echo "Usage: $0 <YEAR> <DAY>"
+    echo "  -h, --help      Show this help"
 }
 
 main() {
-    if [[ $1 -eq "-h" ]]; then
+    case "$1" in
+    -h|--help)
         usage
         exit 0
-    fi
+        ;;
+    esac
 
     if [[ -z "$AOC_SESSION" ]]; then
         echo "Please set \$AOC_SESSION or put it in $BASE_DIR/.env"
