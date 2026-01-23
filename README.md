@@ -8,7 +8,7 @@ https://adventofcode.com/
 
 ## Notes
 
-Use `aocinput` to get the AOC input file. To use it first set the `$AOC_SESSION` variable or put it in `.env`
+Use `aocinput` to get the AOC input puzzle. To use it first set the `$AOC_SESSION` variable or put it in `.env`
 
 ### Usage
 

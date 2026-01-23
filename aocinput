@@ -5,13 +5,13 @@ AOC_URL="https://adventofcode.com"
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Load .env if it exists
-if [[ -f "$BASE_DIR/.env" ]]; then
-    source "$BASE_DIR/.env"
+if [[ -f "${BASE_DIR}/.env" ]]; then
+    source "${BASE_DIR}/.env"
 fi
 
 main() {
     if [[ -z "$AOC_SESSION" ]]; then
-        echo "Please set AOC_SESSION or put it in $BASE_DIR/.env"
+        echo "Please set \$AOC_SESSION or put it in $BASE_DIR/.env"
         exit 1
     fi
 
