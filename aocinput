@@ -9,7 +9,16 @@ if [[ -f "${BASE_DIR}/.env" ]]; then
     source "${BASE_DIR}/.env"
 fi
 
+usage() {
+    echo "Usage: $0 <YEAR> <DAY>"
+}
+
 main() {
+    if [[ $1 -eq "-h" ]]; then
+        usage
+        exit 0
+    fi
+
     if [[ -z "$AOC_SESSION" ]]; then
         echo "Please set \$AOC_SESSION or put it in $BASE_DIR/.env"
         exit 1
@@ -19,7 +28,7 @@ main() {
     local day="$2"
 
     if [[ -z "$year" || -z "$day" ]]; then
-        echo "Usage: $0 YEAR DAY"
+        usage
         exit 1
     fi
 
