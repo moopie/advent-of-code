@@ -15,13 +15,16 @@ fn main() {
 
     let input = read_to_string("input.txt").expect("err");
 
-    let result = solve_part1(input.as_str());
+    let part1 = solve_part1(input.as_str());
 
-    println!("Part 1 solution: {}", result);
+    println!("Part 1 solution: {}", part1);
+
+    let part2 = solve_part2(input.as_str());
+    println!("Part 2 solution: {}", part2);
 }
 
 fn solve_part1(input: &str) -> i64 {
-    let machines = parse_input(input);
+    let machines = parse_input(input, false);
 
     let mut sum = 0;
 
@@ -50,15 +53,47 @@ fn solve_part1(input: &str) -> i64 {
 
     sum
 }
-fn parse_input(input: &str) -> Vec<Machine> {
+
+fn solve_part2(input: &str) -> i64 {
+    let machines = parse_input(input, true);
+
+    let mut sum = 0;
+
+    for m in machines {
+        let det = m.ax * m.by - m.bx * m.ay;
+        if det == 0 {
+            continue; // no unique solution
+        }
+
+        let a_num = m.px * m.by - m.bx * m.py;
+        let b_num = m.ax * m.py - m.px * m.ay;
+
+        // must be divisible
+        if a_num % det != 0 || b_num % det != 0 {
+            continue;
+        }
+
+        let a = a_num / det;
+        let b = b_num / det;
+
+        // part 2: all solutions count
+        if a >= 0 && b >= 0 {
+            sum += 3 * a + b;
+        }
+    }
+
+    sum
+}
+
+fn parse_input(input: &str, correct_prize: bool) -> Vec<Machine> {
     input
         .trim()
         .split("\n\n") // split blocks
-        .map(|block| parse_machine(block))
+        .map(|block| parse_machine(block, correct_prize))
         .collect()
 }
 
-fn parse_machine(block: &str) -> Machine {
+fn parse_machine(block: &str, correct_prize: bool) -> Machine {
     let mut lines = block.lines().map(|l| l.trim());
 
     let a = lines.next().unwrap();
@@ -67,7 +102,12 @@ fn parse_machine(block: &str) -> Machine {
 
     let (ax, ay) = parse_xy(a);
     let (bx, by) = parse_xy(b);
-    let (px, py) = parse_xy(p);
+    let (mut px, mut py) = parse_xy(p);
+
+    if correct_prize {
+        px += 10_000_000_000_000;
+        py += 10_000_000_000_000;
+    }
 
     Machine {
         ax,
