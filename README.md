@@ -8,10 +8,10 @@ https://adventofcode.com/
 
 ## Notes
 
-Use `aocinput` to get the AOC puzzle input. To use it first set the `$AOC_SESSION` variable or put it in `.env`
+Use `aocpuzzle` to get the AOC puzzle input. To use it first set the `$AOC_SESSION` variable or put it in `.env`
 
 ### Usage
 
 ```bash
-~ ./aocinput <YEAR> <DAY>
+~ ./aocpuzzle <YEAR> <DAY>
 ```
