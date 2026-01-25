@@ -1,5 +1,4 @@
 use std::fs::read_to_string;
-use std::path::Component::ParentDir;
 
 fn main() {
     println!("AOC 2024 day 14!");
@@ -9,6 +8,8 @@ fn main() {
     let part1 = solve_part_1(input.as_str(), 101, 103);
 
     println!("Part 1 solution: {}", part1);
+
+    solve_part_2(input.as_str(), 101, 103)
 }
 
 #[derive(Debug)]
@@ -19,14 +20,19 @@ struct Robot {
 
 fn solve_part_1(input: &str, width: i64, height: i64) -> u64 {
     let robots = parse_input(input);
+
+    get_safety_factor(&robots, width, height, 100)
+}
+
+fn get_safety_factor(robots: &[Robot], width: i64, height: i64, step: u64) -> u64 {
     let mut sums = [0u64; 4];
 
     let mid_x = width / 2;
     let mid_y = height / 2;
 
     for robot in robots {
-        let dx = wrap(robot.pos.0 + (robot.vel.0 * 100) % width, width);
-        let dy = wrap(robot.pos.1 + (robot.vel.1 * 100) % height, height);
+        let dx = wrap(robot.pos.0 + (robot.vel.0 * step as i64) % width, width);
+        let dy = wrap(robot.pos.1 + (robot.vel.1 * step as i64) % height, height);
 
         if dx == mid_x || dy == mid_y {
             continue;
@@ -45,6 +51,22 @@ fn solve_part_1(input: &str, width: i64, height: i64) -> u64 {
         sums[quad] += 1;
     }
     sums.iter().product()
+
+}
+
+fn solve_part_2(input: &str, width: i64, height: i64) {
+    let robots = parse_input(input);
+    let mut val = u64::MAX;
+    let mut min_pos = 0;
+
+    for i in 0u64..(width*height) as u64 {
+        let sf = get_safety_factor(&robots, width, height, i);
+        if sf < val {
+            val = sf;
+            min_pos = i;
+        }
+    }
+    println!("Part 2 solution: {}", min_pos);
 }
 
 fn wrap(val: i64, max: i64) -> i64 {
