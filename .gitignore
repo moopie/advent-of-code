@@ -2,6 +2,7 @@
 **/build
 **/bin
 **/obj
+**/*.txt
 .idea
 *.user
 .env
