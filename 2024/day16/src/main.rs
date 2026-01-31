@@ -29,6 +29,42 @@ fn main() {
     let part1 = solve_part_1(contents.as_str());
 
     println!("Part 1 solution: {}", part1);
+
+    let part2 = solve_part_2(contents.as_str());
+
+    println!("Part 2 solution: {}", part2);
+}
+
+fn solve_part_2(input: &str) -> i32 {
+    let (grid, start_pos, end_pos) = parse_input(input);
+
+    let start = State {
+        x: start_pos.0,
+        y: start_pos.1,
+        dir: Dir::E,
+    };
+
+    let dist_start = dijkstra_from_start(&grid, start);
+    let dist_end = dijkstra_from_end(&grid, end_pos);
+
+    let best = dist_start
+        .iter()
+        .filter(|(s, _)| (s.x, s.y) == end_pos)
+        .map(|(_, &c)| c)
+        .min()
+        .unwrap();
+
+    let mut tiles = std::collections::HashSet::new();
+
+    for (s, &ds) in &dist_start {
+        if let Some(&de) = dist_end.get(s) {
+            if ds + de == best {
+                tiles.insert((s.x, s.y));
+            }
+        }
+    }
+
+    tiles.len() as i32
 }
 
 fn solve_part_1(input: &str) -> i32 {
@@ -152,6 +188,109 @@ fn parse_input(input: &str) -> (Grid, (usize, usize), (usize, usize)) {
     )
 }
 
+fn dijkstra_from_start(grid: &Grid, start: State) -> HashMap<State, i32> {
+    let mut heap = BinaryHeap::new();
+    let mut dist = HashMap::new();
+
+    heap.push((Reverse(0), start));
+    dist.insert(start, 0);
+
+    while let Some((Reverse(cost), state)) = heap.pop() {
+        if cost > dist[&state] {
+            continue;
+        }
+
+        // forward
+        let (nx, ny) = forward(state.x, state.y, state.dir);
+        if grid[ny][nx] != '#' {
+            let ns = State {
+                x: nx,
+                y: ny,
+                dir: state.dir,
+            };
+            let nc = cost + 1;
+            if dist.get(&ns).map_or(true, |&c| nc < c) {
+                dist.insert(ns, nc);
+                heap.push((Reverse(nc), ns));
+            }
+        }
+
+        // turns
+        for nd in [turn_left(state.dir), turn_right(state.dir)] {
+            let ns = State {
+                x: state.x,
+                y: state.y,
+                dir: nd,
+            };
+            let nc = cost + 1000;
+            if dist.get(&ns).map_or(true, |&c| nc < c) {
+                dist.insert(ns, nc);
+                heap.push((Reverse(nc), ns));
+            }
+        }
+    }
+
+    dist
+}
+
+fn dijkstra_from_end(grid: &Grid, end: (usize, usize)) -> HashMap<State, i32> {
+    let mut heap = BinaryHeap::new();
+    let mut dist = HashMap::new();
+
+    for dir in [Dir::N, Dir::E, Dir::S, Dir::W] {
+        let s = State {
+            x: end.0,
+            y: end.1,
+            dir,
+        };
+        heap.push((Reverse(0), s));
+        dist.insert(s, 0);
+    }
+
+    while let Some((Reverse(cost), state)) = heap.pop() {
+        if cost > dist[&state] {
+            continue;
+        }
+
+        // backward move (reverse of forward)
+        let (bx, by) = match state.dir {
+            Dir::N => (state.x, state.y + 1),
+            Dir::S => (state.x, state.y - 1),
+            Dir::E => (state.x - 1, state.y),
+            Dir::W => (state.x + 1, state.y),
+        };
+
+        if grid[by][bx] != '#' {
+            let ns = State {
+                x: bx,
+                y: by,
+                dir: state.dir,
+            };
+            let nc = cost + 1;
+            if dist.get(&ns).map_or(true, |&c| nc < c) {
+                dist.insert(ns, nc);
+                heap.push((Reverse(nc), ns));
+            }
+        }
+
+        // turns
+        for nd in [turn_left(state.dir), turn_right(state.dir)] {
+            let ns = State {
+                x: state.x,
+                y: state.y,
+                dir: nd,
+            };
+            let nc = cost + 1000;
+            if dist.get(&ns).map_or(true, |&c| nc < c) {
+                dist.insert(ns, nc);
+                heap.push((Reverse(nc), ns));
+            }
+        }
+    }
+
+    dist
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -206,5 +345,19 @@ mod tests {
         let val = solve_part_1(EXAMPLE_INPUT2);
 
         assert_eq!(11048, val);
+    }
+
+    #[test]
+    fn part2_should_be_45() {
+        let val = solve_part_2(EXAMPLE_INPUT1);
+
+        assert_eq!(45, val);
+    }
+
+    #[test]
+    fn part2_should_be_64() {
+        let val = solve_part_2(EXAMPLE_INPUT2);
+
+        assert_eq!(64, val);
     }
 }
