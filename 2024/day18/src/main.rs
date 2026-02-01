@@ -8,6 +8,35 @@ fn main() {
     let part1 = solve_part1(input.as_str(), 71, 1024);
 
     println!("Part 1 solution: {}", part1);
+
+    let part2 = solve_part2(input.as_str(), 71, 1024);
+
+    println!("Part 2 solution: {}", part2);
+}
+
+fn solve_part2(input: &str, size: usize, _unused: usize) -> String {
+    let corrupt = parse_input(input);
+
+    let mut lo = 0usize;
+    let mut hi = corrupt.len();
+
+    while lo < hi {
+        let mid = (lo + hi) / 2;
+
+        let dist = solve_part1(input, size, mid);
+
+        if dist != 0 {
+            // still reachable → need MORE corruption
+            lo = mid + 1;
+        } else {
+            // unreachable → too far
+            hi = mid;
+        }
+    }
+
+    // lo is the FIRST index that breaks the path
+    let (x, y) = corrupt[lo - 1];
+    format!("{},{}", x, y)
 }
 
 fn solve_part1(input: &str, size: usize, limit: usize) -> i32 {
@@ -80,6 +109,18 @@ mod tests {
     2,6
     5,1
     1,2
+    5,5
+    2,5
+    6,5
+    1,4
+    0,4
+    6,4
+    1,1
+    6,1
+    1,0
+    0,5
+    1,6
+    2,0
     "#;
 
     #[test]
