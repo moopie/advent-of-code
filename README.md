@@ -13,5 +13,5 @@ Use `aocpuzzle` to get the AOC puzzle input. To use it first set the `$AOC_SESSI
 ### Usage
 
 ```bash
-~ ./aocpuzzle <YEAR> <DAY>
+~ ./aocpuzzle <year> <day>
 ```

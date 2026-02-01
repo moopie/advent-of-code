@@ -10,13 +10,13 @@ if [[ -f "${BASE_DIR}/.env" ]]; then
 fi
 
 usage() {
-    echo "Usage: $0 <YEAR> <DAY>"
+    echo "Usage: $0 <year> <day>"
     echo "  -h, --help      Show this help"
 }
 
 main() {
     case "$1" in
-    -h|--help)
+    -h | --help)
         usage
         exit 0
         ;;
