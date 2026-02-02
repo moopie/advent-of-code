@@ -8,6 +8,24 @@ fn main() {
     let part1 = solve_part1(input.as_str());
 
     println!("Part 1 solution: {}", part1);
+
+    let part2 = solve_part2(input.as_str());
+
+    println!("Part 2 solution: {}", part2);
+}
+
+fn solve_part2(input: &str) -> i64 {
+    let (patterns, designs) = parse_input(input);
+
+    let mut sum = 0i64;
+    for design in designs {
+        let mut memo = HashMap::new();
+        let count = count_builds(design, &patterns, &mut memo);
+        if count > 0 {
+            sum += count as i64;
+        }
+    }
+    sum
 }
 
 fn solve_part1(input: &str) -> i32 {
@@ -73,8 +91,15 @@ mod tests {
 
     #[test]
     fn part1_should_be_6() {
-        let a = solve_part1(EXAMPLE);
+        let actual = solve_part1(EXAMPLE);
 
-        assert_eq!(6, a);
+        assert_eq!(6, actual);
+    }
+
+    #[test]
+    fn part2_should_be_16() {
+        let actual = solve_part2(EXAMPLE);
+
+        assert_eq!(16, actual);
     }
 }
