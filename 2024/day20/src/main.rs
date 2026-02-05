@@ -7,12 +7,24 @@ fn main() {
 
     let input = read_to_string("input.txt").unwrap();
 
-    let part1 = solve_part1(input.as_str(), 100);
+    let part1 = solve_part1(input.as_str(), 100, 2);
 
     println!("Part 1 solution: {}", part1);
+
+    let part2 = solve_part2(input.as_str(), 100, 20);
+
+    println!("Part 2 solution: {}", part2);
 }
 
-fn solve_part1(input: &str, limit: u64) -> i64 {
+fn solve_part1(input: &str, cost_limit: u64, distance_limit: i32) -> i64 {
+    solve_with_distance_limit(input, cost_limit, distance_limit)
+}
+
+fn solve_part2(input: &str, cost_limit: u64, distance_limit: i32) -> i64 {
+    solve_with_distance_limit(input, cost_limit, distance_limit)
+}
+
+fn solve_with_distance_limit(input: &str, cost_limit: u64, distance_limit: i32) -> i64 {
     let (grid, start, end) = parse_input(input);
 
     let dist_s = distance(&grid, start);
@@ -33,10 +45,10 @@ fn solve_part1(input: &str, limit: u64) -> i64 {
                 continue;
             }
 
-            for dy in -2i32..=2 {
-                for dx in -2i32..=2 {
+            for dy in -distance_limit..=distance_limit {
+                for dx in -distance_limit..=distance_limit {
                     let cheat = dx.abs() + dy.abs();
-                    if cheat == 0 || cheat > 2 {
+                    if cheat == 0 || cheat > distance_limit {
                         continue;
                     }
 
@@ -62,7 +74,7 @@ fn solve_part1(input: &str, limit: u64) -> i64 {
 
                     let cheated = d1 + cheat as u64 + d2;
 
-                    if norm >= cheated + limit {
+                    if norm >= cheated + cost_limit {
                         count += 1;
                     }
                 }
@@ -166,7 +178,7 @@ mod tests {
 
     #[test]
     fn part1_should_be_44() {
-        let actual = solve_part1(EXAMPLE, 2);
+        let actual = solve_part1(EXAMPLE, 2, 2);
 
         assert_eq!(44, actual);
     }
