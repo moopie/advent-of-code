@@ -8,6 +8,7 @@ fn main() {
     let input = read_to_string("input.txt").unwrap();
 
     println!("Part 1: {}", solve_part_1(input.as_str()));
+    println!("Part 2: {}", solve_part_2(input.as_str()));
 }
 
 fn solve_part_1(input: &str) -> i64 {
@@ -44,12 +45,58 @@ fn solve_part_1(input: &str) -> i64 {
     count
 }
 
+fn solve_part_2(input: &str) -> String {
+    let pairs = parse_input(input);
+    let mut graph: HashMap<&str, HashSet<&str>> = HashMap::new();
+
+    for (a, b) in pairs {
+        graph.entry(a).or_default().insert(b);
+        graph.entry(b).or_default().insert(a);
+    }
+
+    let nodes: Vec<&str> = graph.keys().copied().collect();
+
+    let mut best: Vec<&str> = Vec::new();
+    let mut current: Vec<&str> = Vec::new();
+
+    expand(&graph, nodes, &mut current, &mut best);
+
+    best.sort();
+    best.join(",")
+}
+
 fn parse_input(input: &str) -> Vec<(&str, &str)> {
     input
         .lines()
         .filter(|x| !x.trim().is_empty())
         .map(|x| x.trim().split_once("-").unwrap())
         .collect()
+}
+
+fn expand<'a>(
+    graph: &HashMap<&'a str, HashSet<&'a str>>,
+    candidates: Vec<&'a str>,
+    current: &mut Vec<&'a str>,
+    best: &mut Vec<&'a str>,
+) {
+    if current.len() > best.len() {
+        *best = current.clone();
+    }
+
+    for (i, &v) in candidates.iter().enumerate() {
+        if current.iter().all(|&u| graph[u].contains(v)) {
+            current.push(v);
+
+            let next_candidates = candidates[i + 1..]
+                .iter()
+                .copied()
+                .filter(|&u| graph[v].contains(u))
+                .collect();
+
+            expand(graph, next_candidates, current, best);
+            current.pop();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -96,5 +143,12 @@ mod tests {
         let actual = solve_part_1(EXAMPLE);
 
         assert_eq!(7, actual);
+    }
+
+    #[test]
+    fn part_2_should_be_co_de_ka_ta() {
+        let actual = solve_part_2(EXAMPLE);
+
+        assert_eq!("co,de,ka,ta", actual);
     }
 }
