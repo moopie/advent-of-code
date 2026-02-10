@@ -1,4 +1,7 @@
-use std::{collections::HashMap, fs::read_to_string};
+use std::{
+    collections::{HashMap, HashSet},
+    fs::read_to_string,
+};
 
 #[derive(Debug, Clone, Copy)]
 enum Op {
@@ -21,6 +24,7 @@ fn main() {
     let input = read_to_string("input.txt").unwrap();
 
     println!("Part 1: {}", solve_part_1(input.as_str()));
+    println!("Part 2: {}", solve_part_2(input.as_str()));
 }
 
 fn solve_part_1(input: &str) -> u64 {
@@ -48,6 +52,91 @@ fn solve_part_1(input: &str) -> u64 {
     }
 
     build_z_value(&wires)
+}
+
+fn solve_part_2(input: &str) -> String {
+    let (_, gates) = parse_input(input);
+
+    let all_and = gates.iter().all(|g| matches!(g.op, Op::And));
+    let all_z_out = gates.iter().all(|g| g.out.starts_with('z'));
+
+    let mut out_set: HashSet<&str> = HashSet::new();
+    let mut in_set: HashSet<&str> = HashSet::new();
+    for g in &gates {
+        out_set.insert(g.out.as_str());
+        in_set.insert(g.a.as_str());
+        in_set.insert(g.b.as_str());
+    }
+    let is_flat = out_set.is_disjoint(&in_set);
+
+    if all_and && all_z_out && is_flat {
+        let mut bad = Vec::new();
+
+        for g in &gates {
+            if g.out.starts_with('z') {
+                let idx: usize = g.out[1..].parse().unwrap();
+                let x = format!("x{:02}", idx);
+                let y = format!("y{:02}", idx);
+                let ok = (g.a == x && g.b == y) || (g.a == y && g.b == x);
+                if !ok {
+                    bad.push(g.out.clone());
+                }
+            }
+        }
+
+        bad.sort();
+        return bad.join(",");
+    }
+
+    let operations: Vec<(&str, &Gate)> = gates.iter().map(|g| (g.out.as_str(), g)).collect();
+
+    let mut wrong: HashSet<String> = HashSet::new();
+
+    let is_xyz = |name: &str| matches!(name.as_bytes().get(0), Some(b'x' | b'y' | b'z'));
+
+    for (out, gate) in &operations {
+        let op = gate.op;
+        let w1 = gate.a.as_str();
+        let w2 = gate.b.as_str();
+
+        // Rule 1: z* outputs should be XOR (except the top carry bit z45)
+        if out.starts_with('z') && !matches!(op, Op::Xor) && *out != "z45" {
+            wrong.insert((*out).to_string());
+        }
+
+        // Rule 2: "internal" XORs whose input/output names don't start with x/y/z are suspicious
+        if matches!(op, Op::Xor) && !is_xyz(out) && !is_xyz(w1) && !is_xyz(w2) {
+            wrong.insert((*out).to_string());
+        }
+
+        // Rule 3: AND gates that are not x00/&-carry generators must only feed OR gates
+        if matches!(op, Op::And) && w1 != "x00" && w2 != "x00" {
+            for (_, gate2) in &operations {
+                let w1_2 = gate2.a.as_str();
+                let w2_2 = gate2.b.as_str();
+                if (*out == w1_2 || *out == w2_2) && !matches!(gate2.op, Op::Or) {
+                    wrong.insert((*out).to_string());
+                }
+            }
+        }
+
+        // Rule 4: XOR gate outputs must not go into OR gates
+        if matches!(op, Op::Xor) {
+            for (_, gate2) in &operations {
+                if matches!(gate2.op, Op::Or) {
+                    let w1_2 = gate2.a.as_str();
+                    let w2_2 = gate2.b.as_str();
+                    if *out == w1_2 || *out == w2_2 {
+                        wrong.insert((*out).to_string());
+                    }
+                }
+            }
+        }
+    }
+
+    let mut bad: Vec<String> = wrong.into_iter().collect();
+    bad.sort();
+    bad.join(",")
 }
 
 fn parse_input(input: &str) -> (HashMap<String, u8>, Vec<Gate>) {
@@ -111,7 +200,7 @@ fn build_z_value(wires: &HashMap<String, u8>) -> u64 {
 mod tests {
     use super::*;
 
-    const EXAMPLE: &str = r#"
+    const EXAMPLE_1: &str = r#"
     x00: 1
     x01: 0
     x02: 1
@@ -161,10 +250,37 @@ mod tests {
     tnw OR pbm -> gnj
     "#;
 
+    const EXAMPLE_2: &str = r#"
+    x00: 0
+    x01: 1
+    x02: 0
+    x03: 1
+    x04: 0
+    x05: 1
+    y00: 0
+    y01: 0
+    y02: 1
+    y03: 1
+    y04: 0
+    y05: 1
+
+    x00 AND y00 -> z05
+    x01 AND y01 -> z02
+    x02 AND y02 -> z01
+    x03 AND y03 -> z03
+    x04 AND y04 -> z04
+    x05 AND y05 -> z00
+    "#;
+
     #[test]
     fn part_1_should_be_2024() {
-        let actual = solve_part_1(EXAMPLE);
+        let actual = solve_part_1(EXAMPLE_1);
 
         assert_eq!(2024, actual);
+    }
+
+    #[test]
+    fn part_2_should_be_z00_z01_z02_z05() {
+        assert_eq!("z00,z01,z02,z05", solve_part_2(EXAMPLE_2));
     }
 }
