@@ -3,6 +3,7 @@
 var input = File.ReadAllText("input.txt");
 
 Console.WriteLine($"Part 1: {Day09.SolvePart1(input)}");
+Console.WriteLine($"Part 2: {Day09.SolvePart2(input)}");
 
 public static class Day09
 {
@@ -13,11 +14,17 @@ public static class Day09
         return histories.Select(ExtrapolateNext).Sum();
     }
 
-    public static List<List<long>> ParseInput(string input)
+    public static long SolvePart2(string input)
+    {
+        var histories = ParseInput(input);
+
+        return histories.Select(ExtrapolatePrevious).Sum();
+    }
+
+    private static List<List<long>> ParseInput(string input)
     {
         return input
-            .Split("\n", StringSplitOptions.RemoveEmptyEntries)
-            .Where(x => !string.IsNullOrEmpty(x))
+            .Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(x => x
                     .Split(" ", StringSplitOptions.RemoveEmptyEntries)
                     .Select(long.Parse)
@@ -58,7 +65,7 @@ public static class Day09
 
         long next = 0;
 
-        for (var i = 0; i < levels.Count - 1 && i >= 0; i++)
+        for (var i = 0; i < levels.Count - 1; i++)
         {
             var level = levels[i];
             var last = level[^1];
@@ -66,5 +73,20 @@ public static class Day09
         }
 
         return next;
+    }
+
+    private static long ExtrapolatePrevious(List<long> history)
+    {
+        var levels = BuildDifferenceLevels(history);
+
+        long prev = 0;
+
+        for (var i = levels.Count - 1; i >= 0; i--)
+        {
+            var level = levels[i];
+            var first = level[0];
+            prev = first - prev;
+        }
+        return prev;
     }
 }
