@@ -3,6 +3,7 @@
 var input = File.ReadAllText("input.txt");
 
 Console.WriteLine($"Part 1: {Day11.SolvePart1(input)}");
+Console.WriteLine($"Part 2: {Day11.SolvePart2(input, 1000000)}");
 
 public record Space(List<(int X, int Y)> Galaxies, int Height, int Width, HashSet<int> EmptyRows, HashSet<int> EmptyCols);
 
@@ -12,44 +13,14 @@ public static class Day11
     {
         var space = ParseInput(input);
 
-        long sum = 0;
+        return CalculateDistance(space);
+    }
 
-        for (var i = 0; i < space.Galaxies.Count; i++)
-        {
-            var (x1, y1) = space.Galaxies[i];
+    public static long SolvePart2(string input, int scale)
+    {
+        var space = ParseInput(input);
 
-            for (var j = i + 1; j < space.Galaxies.Count; j++)
-            {
-                var (x2, y2) = space.Galaxies[j];
-
-                int rMin = Math.Min(x1, x2);
-                int rMax = Math.Max(x1, x2);
-                var cMin = Math.Min(y1, y2);
-                var cMax = Math.Max(y1, y2);
-
-                long dist = (rMax - rMin) + (cMax - cMin);
-
-                for (int r = rMin + 1; r < rMax; r++)
-                {
-                    if (space.EmptyRows.Contains(r))
-                    {
-                        dist += 1;
-                    }
-                }
-
-                for (int c = cMin + 1; c < cMax; c++)
-                {
-                    if (space.EmptyCols.Contains(c))
-                    {
-                        dist += 1;
-                    }
-                }
-
-                sum += dist;
-            }
-        }
-
-        return sum;
+        return CalculateDistance(space, scale);
     }
 
     private static Space ParseInput(string input)
@@ -66,28 +37,61 @@ public static class Day11
         var galaxies = new List<(int X, int Y)>();
 
         for (int y = 0; y < h; y++)
-        {
             for (int x = 0; x < w; x++)
-            {
                 if (lines[y][x] == '#')
-                {
                     galaxies.Add((x, y));
-                }
-            }
-        }
 
-        var rowHasGalaxy = new bool[w];
-        var colHasGalaxy = new bool[h];
+        var rowHasGalaxy = new bool[h];
+        var colHasGalaxy = new bool[w];
 
         foreach (var (x, y) in galaxies)
         {
-            rowHasGalaxy[x] = true;
-            colHasGalaxy[y] = true;
+            rowHasGalaxy[y] = true;
+            colHasGalaxy[x] = true;
         }
 
-        var emptyRows = new HashSet<int>(Enumerable.Range(0, w).Where(r => !rowHasGalaxy[r]));
-        var emptyCols = new HashSet<int>(Enumerable.Range(0, h).Where(c => !colHasGalaxy[c]));
+        var emptyRows = new HashSet<int>(
+            Enumerable.Range(0, h).Where(r => !rowHasGalaxy[r])
+        );
+
+        var emptyCols = new HashSet<int>(
+            Enumerable.Range(0, w).Where(c => !colHasGalaxy[c])
+        );
 
         return new Space(galaxies, h, w, emptyRows, emptyCols);
+    }
+
+    private static long CalculateDistance(Space space, int scale = 2)
+    {
+        long sum = 0;
+
+        for (int i = 0; i < space.Galaxies.Count; i++)
+        {
+            var (x1, y1) = space.Galaxies[i];
+
+            for (int j = i + 1; j < space.Galaxies.Count; j++)
+            {
+                var (x2, y2) = space.Galaxies[j];
+
+                int xMin = Math.Min(x1, x2);
+                int xMax = Math.Max(x1, x2);
+                int yMin = Math.Min(y1, y2);
+                int yMax = Math.Max(y1, y2);
+
+                long dist = (xMax - xMin) + (yMax - yMin);
+
+                for (int x = xMin + 1; x < xMax; x++)
+                    if (space.EmptyCols.Contains(x))
+                        dist += scale - 1;
+
+                for (int y = yMin + 1; y < yMax; y++)
+                    if (space.EmptyRows.Contains(y))
+                        dist += scale - 1;
+
+                sum += dist;
+            }
+        }
+
+        return sum;
     }
 }
