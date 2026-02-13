@@ -1,0 +1,23 @@
+﻿namespace tests;
+
+public class Day11Tests
+{
+    const string Example = @"
+        ...#......
+        .......#..
+        #.........
+        ..........
+        ......#...
+        .#........
+        .........#
+        ..........
+        .......#..
+        #...#.....
+        ";
+
+    [Fact]
+    public void Part1_ShouldBe_374()
+    {
+        Assert.Equal(374, Day11.SolvePart1(Example));
+    }
+}
