@@ -5,12 +5,24 @@ public static class Day12
     public static long SolvePart1(string input)
     {
         long sum = 0;
-        foreach (var (pattern, groups) in ParseInput(input))
+        foreach (var (pattern, groups) in Parse(input))
             sum += CountArrangements(pattern, groups);
         return sum;
     }
 
-    private static IEnumerable<(string Pattern, int[] Groups)> ParseInput(string input)
+    public static long SolvePart2(string input)
+    {
+        long sum = 0;
+        foreach (var (pattern, groups) in Parse(input))
+        {
+            var bigPattern = string.Join('?', Enumerable.Repeat(pattern, 5));
+            var bigGroups = Enumerable.Repeat(groups, 5).SelectMany(x => x).ToArray();
+            sum += CountArrangements(bigPattern, bigGroups);
+        }
+        return sum;
+    }
+
+    private static IEnumerable<(string Pattern, int[] Groups)> Parse(string input)
     {
         foreach (var line in input.Split('\n', StringSplitOptions.RemoveEmptyEntries))
         {

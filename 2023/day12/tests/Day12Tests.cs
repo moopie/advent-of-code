@@ -80,4 +80,10 @@ public class Day12Tests
     {
         Assert.Equal(10, Day12.SolvePart1(Example7));
     }
+
+    [Fact]
+    public void Part2_ShouldBe_525152()
+    {
+        Assert.Equal(525152, Day12.SolvePart2(Example1));
+    }
 }
