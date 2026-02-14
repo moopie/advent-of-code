@@ -1,6 +1,6 @@
 ﻿using main;
 
-Console.WriteLine("AOC 2023 day 13!");
+Console.WriteLine("AOC 2023 day 12!");
 
 var input = File.ReadAllText("input.txt");
 
