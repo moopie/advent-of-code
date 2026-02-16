@@ -22,4 +22,10 @@ public class Day14Tests
     {
         Assert.Equal(136, Day14.SolvePart1(Example));
     }
+
+    [Fact]
+    public void Part2_ShouldBe_64()
+    {
+        Assert.Equal(64, Day14.SolvePart2(Example, 1000000000));
+    }
 }
