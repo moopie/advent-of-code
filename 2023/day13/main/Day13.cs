@@ -30,6 +30,32 @@ public static class Day13
         return total;
     }
 
+    public static int SolvePart2(string input)
+    {
+        int total = 0;
+
+        foreach (var grid in Parse(input))
+        {
+            var h = grid.Length;
+            var w = grid[0].Length;
+
+            var rows = RowsToBinary(grid, h, w).ToList();
+            var columns = ColumnsToBinary(grid, h, w).ToList();
+
+            int horizontal = FindReflectionWithSmudge(rows);
+            if (horizontal > 0)
+            {
+                total += horizontal * 100;
+                continue;
+            }
+
+            int vertical = FindReflectionWithSmudge(columns);
+            total += vertical;
+        }
+
+        return total;
+    }
+
     private static IEnumerable<int> ColumnsToBinary(char[][] grid, int height, int width)
     {
         for (var x = 0; x < width; x++)
@@ -118,5 +144,53 @@ public static class Day13
         }
 
         return 0;
+    }
+
+    private static int FindReflectionWithSmudge(IReadOnlyList<int> values)
+    {
+        for (int split = 1; split < values.Count; split++)
+        {
+            int left = split - 1;
+            int right = split;
+
+            int totalDifferences = 0;
+
+            while (left >= 0 && right < values.Count)
+            {
+                int diff = values[left] ^ values[right];
+
+                if (diff != 0)
+                {
+                    // count how many bits differ
+                    totalDifferences += BitCount(diff);
+
+                    if (totalDifferences > 1)
+                    {
+                        break;
+                    }
+                }
+
+                left--;
+                right++;
+            }
+
+            if (totalDifferences == 1)
+            {
+                return split;
+            }
+        }
+
+        return 0;
+    }
+
+    private static int BitCount(int n)
+    {
+        int count = 0;
+        while (n != 0)
+        {
+            n &= (n - 1);
+            count++;
+        }
+        return count;
     }
 }
