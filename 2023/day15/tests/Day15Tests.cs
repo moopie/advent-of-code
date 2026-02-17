@@ -9,8 +9,14 @@ public class Day15Tests
         ";
 
     [Fact]
-    public void Part1_ShouldBe_()
+    public void Part1_ShouldBe_1320()
     {
         Assert.Equal(1320, Day15.SolvePart1(Example));
+    }
+
+    [Fact]
+    public void Part2_ShouldBe_145()
+    {
+        Assert.Equal(145, Day15.SolvePart2(Example));
     }
 }
