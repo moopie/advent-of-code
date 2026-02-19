@@ -23,4 +23,10 @@ public class Day16Tests
     {
         Assert.Equal(46, Day16.SolvePart1(Example));
     }
+
+    [Fact]
+    public void Part2_ShouldBe_51()
+    {
+        Assert.Equal(51, Day16.SolvePart2(Example));
+    }
 }
