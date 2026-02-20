@@ -62,4 +62,8 @@
     <Project Path="day16/main/main.csproj" />
     <Project Path="day16/tests/tests.csproj" />
   </Folder>
+  <Folder Name="/day17/">
+    <Project Path="day17/main/main.csproj" />
+    <Project Path="day17/tests/tests.csproj" />
+  </Folder>
 </Solution>
