@@ -1,6 +1,6 @@
 namespace main;
 
-record GridMvmnt(string Direction, int Value, string Color);
+record GridMvmnt(string Direction, int Value, string EncodedDirection, int EncodedValue);
 
 public static class Day18
 {
@@ -8,6 +8,20 @@ public static class Day18
     {
         var moves = ParseInput(input);
 
+        return GetArea(moves);
+    }
+
+    public static long SolvePart2(string input)
+    {
+        var moves = ParseInput(input)
+            .Select(m => new GridMvmnt(m.EncodedDirection, m.EncodedValue, "", 0))
+            .ToArray();
+
+        return GetArea(moves);
+    }
+
+    private static long GetArea(GridMvmnt[] moves)
+    {
         // Walk the path, collect vertices, and track perimeter length
         var points = new List<(long X, long Y)>();
         long x = 0;
@@ -62,8 +76,19 @@ public static class Day18
             {
                 var parts = l.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-                // parts[2] is like "(#70c710)" – we keep it as-is for now (used in part 2)
-                return new GridMvmnt(parts[0], int.Parse(parts[1]), parts[2]);
+                var encoded = parts[2].TrimStart("(#").TrimEnd(")").ToString();
+                var dir = int.Parse(encoded[encoded.Length - 1].ToString());
+                var value = encoded.Substring(0, encoded.Length - 1);
+                var ival = Convert.ToInt32(value, 16);
+                var encodedDir = dir switch
+                {
+                    0 => "R",
+                    1 => "D",
+                    2 => "L",
+                    3 => "U",
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                return new GridMvmnt(parts[0], int.Parse(parts[1]), encodedDir, ival);
             })
             .ToArray();
     }
