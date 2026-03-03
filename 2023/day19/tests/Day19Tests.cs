@@ -30,4 +30,10 @@ public class Day19Tests
     {
         Assert.Equal(19114, Day19.SolvePart1(Example));
     }
+
+    [Fact]
+    public void Part2_ShouldBe_167409079868000()
+    {
+        Assert.Equal(167409079868000, Day19.SolvePart2(Example));
+    }
 }
