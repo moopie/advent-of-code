@@ -27,6 +27,24 @@ public static class Day22
         return CountSafe(bricks);
     }
 
+    public static int SolvePart2(string input)
+    {
+        var bricks = ParseInput(input);
+
+        DropBricks(bricks);
+
+        BuildSupports(bricks);
+
+        int sum = 0;
+
+        foreach (var brick in bricks)
+        {
+            sum += CountChainReaction(bricks, brick.Id);
+        }
+
+        return sum;
+    }
+
     private static Brick[] ParseInput(string input)
     {
         var options = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
@@ -138,5 +156,50 @@ public static class Day22
         }
 
         return count;
+    }
+
+    private static int CountChainReaction(Brick[] bricks, int startId)
+    {
+        var fallen = new HashSet<int>();
+        var queue = new Queue<int>();
+
+        fallen.Add(startId);
+        queue.Enqueue(startId);
+
+        while (queue.Count > 0)
+        {
+            var id = queue.Dequeue();
+
+            var brick = bricks.First(b => b.Id == id);
+
+            foreach (var supportedId in brick.Supports)
+            {
+                if (fallen.Contains(supportedId))
+                {
+                    continue;
+                }
+
+                var supported = bricks.First(b => b.Id == supportedId);
+
+                bool stillSupported = false;
+
+                foreach (var supporter in supported.SupportedBy)
+                {
+                    if (!fallen.Contains(supporter))
+                    {
+                        stillSupported = true;
+                        break;
+                    }
+                }
+
+                if (!stillSupported)
+                {
+                    fallen.Add(supportedId);
+                    queue.Enqueue(supportedId);
+                }
+            }
+        }
+
+        return fallen.Count - 1;
     }
 }
