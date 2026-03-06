@@ -12,10 +12,16 @@ public class Day24Tests
             12, 31, 28 @ -1, -2, -1
             20, 19, 15 @  1, -5, -3
         ";
-    
+
     [Fact]
     public void Part1_ShouldBe_2()
     {
         Assert.Equal(2, Day24.SolvePart1(Example, 7, 21));
+    }
+
+    [Fact]
+    public void Part2_ShouldBe_47()
+    {
+        Assert.Equal(47, Day24.SolvePart2(Example));
     }
 }
