@@ -1,7 +1,7 @@
 ENTRY_POINT := src/main.go
 BUILD_DIR := build
-BIN_NAME := day12art1
-INPUT := ../input.txt
+BIN_NAME := day12
+INPUT := ./input.txt
 
 build: $(ENTRY_POINT)
 	mkdir -p $(BUILD_DIR)
