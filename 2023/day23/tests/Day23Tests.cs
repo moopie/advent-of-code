@@ -38,8 +38,8 @@ public class Day23Tests
     }
 
     [Fact]
-    public void Part2_ShouldBe_92()
+    public void Part2_ShouldBe_154()
     {
-        Assert.Equal(92, Day23.SolvePart2(Example));
+        Assert.Equal(154, Day23.SolvePart2(Example));
     }
 }
