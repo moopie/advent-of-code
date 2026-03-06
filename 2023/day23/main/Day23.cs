@@ -3,12 +3,12 @@ namespace main;
 public static class Day23
 {
     private static readonly (int dx, int dy)[] Directions =
-    {
-        (0, 1),   // south
-        (0, -1),  // north
-        (1, 0),   // east
-        (-1, 0)   // west
-    };
+    [
+        (1,0),
+        (-1,0),
+        (0,1),
+        (0,-1)
+    ];
 
     public static int SolvePart1(string input)
     {
@@ -17,12 +17,33 @@ public static class Day23
         var start = FindStart(grid);
         var end = FindEnd(grid);
 
-        var visited = new HashSet<(int x, int y)>();
+        var visited = new HashSet<(int, int)>();
 
-        return DFS(start.x, start.y, end, grid, visited);
+        return DFSPart1(start.Item1, start.Item2, end, grid, visited);
     }
 
-    private static int DFS(int x, int y, (int, int) end, char[][] grid, HashSet<(int, int)> visited)
+    public static int SolvePart2(string input)
+    {
+        var grid = ParseInput(input);
+
+        var start = FindStart(grid);
+        var end = FindEnd(grid);
+
+        var nodes = FindNodes(grid, start, end);
+
+        var graph = BuildGraph(grid, nodes);
+
+        var visited = new HashSet<(int, int)>();
+
+        return DFSGraph(start, end, graph, visited);
+    }
+
+    private static int DFSPart1(
+        int x,
+        int y,
+        (int, int) end,
+        char[][] grid,
+        HashSet<(int, int)> visited)
     {
         if ((x, y) == end)
         {
@@ -33,14 +54,14 @@ public static class Day23
 
         int best = int.MinValue;
 
-        foreach (var (nx, ny) in GetNeighbors(x, y, grid))
+        foreach (var (nx, ny) in GetNeighborsPart1(x, y, grid))
         {
             if (visited.Contains((nx, ny)))
             {
                 continue;
             }
 
-            int result = DFS(nx, ny, end, grid, visited);
+            var result = DFSPart1(nx, ny, end, grid, visited);
 
             if (result != int.MinValue)
             {
@@ -53,9 +74,9 @@ public static class Day23
         return best;
     }
 
-    private static IEnumerable<(int x, int y)> GetNeighbors(int x, int y, char[][] grid)
+    private static IEnumerable<(int, int)> GetNeighborsPart1(int x, int y, char[][] grid)
     {
-        char tile = grid[y][x];
+        var tile = grid[y][x];
 
         if (tile == '^')
         {
@@ -83,20 +104,10 @@ public static class Day23
 
         foreach (var (dx, dy) in Directions)
         {
-            int nx = x + dx;
-            int ny = y + dy;
+            var nx = x + dx;
+            var ny = y + dy;
 
-            if (ny < 0 || ny >= grid.Length)
-            {
-                continue;
-            }
-
-            if (nx < 0 || nx >= grid[0].Length)
-            {
-                continue;
-            }
-
-            if (grid[ny][nx] == '#')
+            if (!Walkable(grid, nx, ny))
             {
                 continue;
             }
@@ -105,32 +116,177 @@ public static class Day23
         }
     }
 
-    private static (int x, int y) FindStart(char[][] grid)
+    private static int DFSGraph(
+        (int, int) node,
+        (int, int) end,
+        Dictionary<(int, int), List<((int, int), int)>> graph,
+        HashSet<(int, int)> visited)
     {
-        for (int x = 0; x < grid[0].Length; x++)
+        if (node == end)
         {
-            if (grid[0][x] == '.')
+            return 0;
+        }
+
+        visited.Add(node);
+
+        int best = int.MinValue;
+
+        foreach (var (next, dist) in graph[node])
+        {
+            if (visited.Contains(next))
+            {
+                continue;
+            }
+
+            var result = DFSGraph(next, end, graph, visited);
+
+            if (result != int.MinValue)
+            {
+                best = Math.Max(best, result + dist);
+            }
+        }
+
+        visited.Remove(node);
+
+        return best;
+    }
+
+    private static Dictionary<(int, int), List<((int, int), int)>> BuildGraph(
+        char[][] grid,
+        HashSet<(int, int)> nodes)
+    {
+        var graph = new Dictionary<(int, int), List<((int, int), int)>>();
+
+        foreach (var node in nodes)
+        {
+            graph[node] = new List<((int, int), int)>();
+
+            foreach (var (dx, dy) in Directions)
+            {
+                var x = node.Item1 + dx;
+                var y = node.Item2 + dy;
+
+                if (!Walkable(grid, x, y))
+                {
+                    continue;
+                }
+
+                var px = node.Item1;
+                var py = node.Item2;
+
+                var dist = 1;
+
+                while (!nodes.Contains((x, y)))
+                {
+                    foreach (var (ndx, ndy) in Directions)
+                    {
+                        var nx = x + ndx;
+                        var ny = y + ndy;
+
+                        if (!Walkable(grid, nx, ny))
+                        {
+                            continue;
+                        }
+
+                        if (nx == px && ny == py)
+                        {
+                            continue;
+                        }
+
+                        px = x;
+                        py = y;
+                        x = nx;
+                        y = ny;
+                        dist++;
+
+                        break;
+                    }
+                }
+
+                graph[node].Add(((x, y), dist));
+            }
+        }
+
+        return graph;
+    }
+
+    private static HashSet<(int, int)> FindNodes(
+        char[][] grid,
+        (int, int) start,
+        (int, int) end)
+    {
+        var nodes = new HashSet<(int, int)>();
+
+        for (var y = 0; y < grid.Length; y++)
+        {
+            for (var x = 0; x < grid[0].Length; x++)
+            {
+                if (!Walkable(grid, x, y))
+                {
+                    continue;
+                }
+
+                var neighbors = 0;
+
+                foreach (var (dx, dy) in Directions)
+                {
+                    if (Walkable(grid, x + dx, y + dy))
+                    {
+                        neighbors++;
+                    }
+                }
+
+                if (neighbors != 2 || (x, y) == start || (x, y) == end)
+                {
+                    nodes.Add((x, y));
+                }
+            }
+        }
+
+        return nodes;
+    }
+
+    private static bool Walkable(char[][] grid, int x, int y)
+    {
+        if (y < 0 || y >= grid.Length)
+        {
+            return false;
+        }
+
+        if (x < 0 || x >= grid[0].Length)
+        {
+            return false;
+        }
+
+        return grid[y][x] != '#';
+    }
+
+    private static (int, int) FindStart(char[][] grid)
+    {
+        for (var x = 0; x < grid[0].Length; x++)
+        {
+            if (grid[0][x] != '#')
             {
                 return (x, 0);
             }
         }
 
-        throw new Exception("Start not found");
+        throw new Exception();
     }
 
-    private static (int x, int y) FindEnd(char[][] grid)
+    private static (int, int) FindEnd(char[][] grid)
     {
-        int last = grid.Length - 1;
+        var y = grid.Length - 1;
 
-        for (int x = 0; x < grid[0].Length; x++)
+        for (var x = 0; x < grid[0].Length; x++)
         {
-            if (grid[last][x] == '.')
+            if (grid[y][x] != '#')
             {
-                return (x, last);
+                return (x, y);
             }
         }
 
-        throw new Exception("End not found");
+        throw new Exception();
     }
 
     private static char[][] ParseInput(string input)

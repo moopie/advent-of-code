@@ -5,3 +5,4 @@ Console.WriteLine("AOC 2023 day 23!");
 var input = File.ReadAllText("input.txt");
 
 Console.WriteLine($"Part 1: {Day23.SolvePart1(input)}");
+Console.WriteLine($"Part 2: {Day23.SolvePart2(input)}");
