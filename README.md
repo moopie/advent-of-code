@@ -1,7 +1,6 @@
-# Advent of Code
+# [Advent of Code](https://adventofcode.com)
 
-https://adventofcode.com/
-
+- 2015: Haskell
 - 2023: C#
 - 2024: Rust
 - 2025: Go
@@ -12,6 +11,6 @@ Use `aocinput` to get the AOC puzzle input. To use it first set the `$AOC_SESSIO
 
 ### Usage
 
-```bash
+```console
 $ ./aocinput <year> <day>
 ```
