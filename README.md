@@ -1,9 +1,9 @@
 # [Advent of Code](https://adventofcode.com)
 
-- 2015: Haskell
-- 2023: C#
-- 2024: Rust
-- 2025: Go
+- [2015](https://adventofcode.com/2015): Haskell
+- [2023](https://adventofcode.com/2023): C#
+- [2024](https://adventofcode.com/2024): Rust
+- [2025](https://adventofcode.com/2025): Go
 
 ## Notes
 
