@@ -1,0 +1,54 @@
+cabal-version:      3.14
+name:               day04
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            MIT
+license-file:       LICENSE
+author:             Anton Amirian
+maintainer:         extuessl@gmail.com
+-- copyright:
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  Day04
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        memory ^>=0.18.0,
+        bytestring ^>=0.12.2.0,
+        base ^>=4.22.0.0,
+        cryptonite
+    hs-source-dirs:   src
+    default-language: GHC2024
+
+executable day04
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.22.0.0,
+        day04
+
+    hs-source-dirs:   app
+    default-language: GHC2024
+
+test-suite day04-test
+    import:           warnings
+    default-language: GHC2024
+    -- other-modules:
+    -- other-extensions:
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    build-depends:
+        hspec ^>=2.11.17,
+        base ^>=4.22.0.0,
+        day04
