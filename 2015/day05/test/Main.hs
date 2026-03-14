@@ -10,4 +10,4 @@ main = hspec $ do
         it "'jchzalrnumimnmhp' is naughty" $ solvePart1 "jchzalrnumimnmhp" `shouldBe` 0
 
         it "'qjhvhtzxzqqjkmpb' is nice" $ solvePart2 "qjhvhtzxzqqjkmpb" `shouldBe` 1
-        it "'jchzalrnumimnmhp' is naughty" $ solvePart2 "uurcxstgmygtbstg" `shouldBe` 0
+        it "'uurcxstgmygtbstg' is naughty" $ solvePart2 "uurcxstgmygtbstg" `shouldBe` 0
