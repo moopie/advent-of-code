@@ -1,4 +1,5 @@
-module Day05 (solvePart1) where
+{-# OPTIONS_GHC -Wno-typed-holes #-}
+module Day05 (solvePart1, solvePart2) where
 
 import Data.List (isInfixOf)
 
@@ -20,3 +21,23 @@ isNice s =
     hasThreeVowels s &&
     hasDouble s &&
     hasNoForbidden s
+
+    
+solvePart2 :: String -> Int
+solvePart2 input =
+    length $ filter isNicePart2 $ lines input
+
+isNicePart2 :: String -> Bool
+isNicePart2 str =
+    hasRepeatedPair str && hasRepeatWithGap str
+
+hasRepeatedPair :: String -> Bool
+hasRepeatedPair (a:b:rest) =
+    [a,b] `isInfixOf` rest || hasRepeatedPair (b:rest)
+hasRepeatedPair _ = False
+
+hasRepeatWithGap :: String -> Bool
+hasRepeatWithGap (a:b:c:rest)
+    | a == c    = True
+    | otherwise = hasRepeatWithGap (b:c:rest)
+hasRepeatWithGap _ = False
